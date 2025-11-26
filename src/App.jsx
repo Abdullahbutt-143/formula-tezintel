@@ -8,6 +8,11 @@ import SiteOverview from "./pages/SiteOverview";
 import SiteInputs from "./pages/SiteInputs";
 import FormulasListPage from "./formulas/FormulasListPage";
 import ValuationFormulas from "./formulas/ValuationFormulas";
+import ForecastFormula from "./formulas/ForecastFormula";
+import GrossOperatingIncomeFormulas from "./formulas/GrossOperatingIncomeFormulas";
+import OperatingExpenseFormulas from "./formulas/OperatingExpenseFormulas";
+import GasolineVolumeFormula from "./formulas/GasolineVolumeFormula";
+import DieselVolumeFormula from "./formulas/DieselVolumeFormula";
 function App() {
   return (
     <Router>
@@ -19,6 +24,11 @@ function App() {
         <Route path="/site/:siteName/user-inputs" element={<SiteInputs />} />
         <Route path="/formulas" element={<FormulasListPage />} />
         <Route path="/formulas/valuation" element={<ValuationFormulas />} />
+        <Route path="/formulas/forecast" element={<ForecastFormula />} />
+        <Route path="/formulas/gross-operating-income" element={<GrossOperatingIncomeFormulas />} />
+        <Route path="/formulas/operating-expenses" element={<OperatingExpenseFormulas />} />
+        <Route path="/formulas/gasoline-volume" element={<GasolineVolumeFormula />} />
+        <Route path="/formulas/diesel-volume" element={<DieselVolumeFormula />} />
       </Routes>
     </Router>
   )

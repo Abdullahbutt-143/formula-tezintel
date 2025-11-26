@@ -33,7 +33,7 @@ const FormulasListPage = () => {
     {
       name: "Forecasting",
       description: "Revenue and growth projections",
-      path: "/formulas/forecasting",
+      path: "/formulas/forecast",
       icon: TrendingUp,
       color: "green",
       category: "Financial"
@@ -41,7 +41,7 @@ const FormulasListPage = () => {
     {
       name: "Monthly Gas Total",
       description: "Total monthly gasoline sales calculation",
-      path: "/formulas/monthly-gas-total",
+      path: "/formulas/gasoline-volume",
       icon: Fuel,
       color: "orange",
       category: "Fuel Operations"
@@ -49,7 +49,7 @@ const FormulasListPage = () => {
     {
       name: "Monthly Diesel Total",
       description: "Total monthly diesel sales calculation",
-      path: "/formulas/monthly-diesel-total",
+      path: "/formulas/diesel-volume",
       icon: Fuel,
       color: "yellow",
       category: "Fuel Operations"
@@ -121,7 +121,7 @@ const FormulasListPage = () => {
     {
       name: "Operating Expense",
       description: "Operating costs and expense ratios",
-      path: "/formulas/operating-expense",
+      path: "/formulas/operating-expenses",
       icon: BarChart3,
       color: "rose",
       category: "Financial"
