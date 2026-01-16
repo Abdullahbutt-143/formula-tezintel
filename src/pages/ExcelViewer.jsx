@@ -9,6 +9,7 @@ import {
   Calendar,
   TrendingUp,
   GitCompare,
+  Plus,
 } from "lucide-react";
 import SiteDetails from "./SiteDetails";
 import ComparisonPage from "./ComparisonPage";
@@ -155,6 +156,13 @@ const ExcelViewer = () => {
               >
                 <BarChart3 size={20} />
                 Formulas
+              </button>
+              <button
+                onClick={() => navigate("/generate-sites")}
+                className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-semibold transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/25"
+              >
+                <Plus size={20} />
+                Generate site
               </button>
             </div>
           </div>
