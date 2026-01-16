@@ -217,7 +217,7 @@ const Skippers = () => {
           finalResult?.custom_data?.new_monthly_volume_projections?.table_data?.Year1?.[
             "Diesel Volume (Gallons)"
           ];
-
+        console.log("monthlyGas", monthlyGas);
         setValuation({
           total: customValuation,
           monthlyGas: monthlyGas,
@@ -425,9 +425,7 @@ const Skippers = () => {
                   fontSize: "1.1em",
                 }}
               >
-                {valuation?.new_monthly_volume_projections?.table_data?.Year1?.[
-                  "Monthly Gasoline Volume (Gallons)"
-                ] || "N/A"}
+                {valuation?.monthlyGas || "N/A"}
               </td>
               <td
                 style={{
