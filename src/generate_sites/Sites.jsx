@@ -16,6 +16,12 @@ const Sites = () => {
 
     const handleSiteClick = async (site) => {
         if (site.id === "skippers-port") {
+            const token = localStorage.getItem("access_token");
+            if (token) {
+                navigate("/skippers");
+                return;
+            }
+
             setLoadingSite(site.id);
             try {
                 const response = await fetch(
