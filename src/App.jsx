@@ -13,6 +13,7 @@ import GrossOperatingIncomeFormulas from "./formulas/GrossOperatingIncomeFormula
 import OperatingExpenseFormulas from "./formulas/OperatingExpenseFormulas";
 import GasolineVolumeFormula from "./formulas/GasolineVolumeFormula";
 import DieselVolumeFormula from "./formulas/DieselVolumeFormula";
+import Sites from "./generate_sites/Sites";
 function App() {
   return (
     <Router>
@@ -29,6 +30,7 @@ function App() {
         <Route path="/formulas/operating-expenses" element={<OperatingExpenseFormulas />} />
         <Route path="/formulas/gasoline-volume" element={<GasolineVolumeFormula />} />
         <Route path="/formulas/diesel-volume" element={<DieselVolumeFormula />} />
+        <Route path="/generate-sites" element={<Sites />} />
       </Routes>
     </Router>
   )
