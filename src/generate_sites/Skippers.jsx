@@ -17,47 +17,46 @@ const Skippers = () => {
           project_type: "projectval",
           facility_type: "gas_station",
           development_type: "new",
+
           business_leads: [],
           addons: [],
-          retail_unit: [
-            {
-              cstoresalespermonth: 0,
-              foodsalespermonth: 0,
-              carwashpermonth: 0,
-            },
-          ],
           devStrategyAddon: [],
-          strategies: [
-            {
-              num_mpds: 6,
-              num_auto_diesel_hoses: 12,
-              store_size: 6000,
-              gas_brand_consideration: "branded",
-              qsr_private_deli_brand: "deli",
-              qsr_private_deli_size: "300",
-              num_cooler_doors: 18,
-              num_freezers_doors: 4,
-              is_beer_cave: "yes",
-              is_24_hour_ops: "yes",
-              is_truck_stop: "false",
-            },
-          ],
-          industrial_sites: [
-            {
-              report_title: "skippers port",
-              address: "2124 Marina Bay Drive, Kemah, TX",
-              state: "TX",
-              is_at_intersection: "yes",
-              total_area_sqft: 87120,
-              estimated_purchase_per_price_sq_ft: 17,
-              is_site_plan_provided: "yes",
-              curb_cuts_pri: 2,
-              frontage_footage_pri: 80,
-              is_functioning_retail: "no",
-              lat: 29.5426423,
-              lng: -95.0511118,
-            },
-          ],
+
+          retail_unit: {
+            cstoresalespermonth: 0,
+            foodsalespermonth: 0,
+            carwashpermonth: 0,
+          },
+
+          strategies: {
+            num_mpds: 6,
+            num_auto_diesel_hoses: 12,
+            store_size: 6000,
+            gas_brand_consideration: "branded",
+            qsr_private_deli_brand: "deli",
+            qsr_private_deli_size: "300",
+            num_cooler_doors: 18,
+            num_freezers_doors: 4,
+            is_beer_cave: "yes",
+            is_24_hour_ops: "yes",
+            is_truck_stop: "false",
+          },
+
+          industrial_sites: {
+            report_title: "skippers port",
+            address: "2124 Marina Bay Drive, Kemah, TX",
+            state: "TX",
+            is_at_intersection: "yes",
+            total_area_sqft: 87120,
+            estimated_purchase_per_price_sq_ft: 17,
+            is_site_plan_provided: "yes",
+            curb_cuts_pri: 2,
+            frontage_footage_pri: 80,
+            is_functioning_retail: "no",
+            lat: 29.5426423,
+            lng: -95.0511118,
+          },
+
           category_type: "commercial",
         };
 
@@ -95,8 +94,9 @@ const Skippers = () => {
 
         // 🔹 SAFE EXTRACTION
         setValuation(finalResult?.valuation || finalResult?.valuation_result);
-        setForecasting(finalResult?.forecasting || finalResult?.forecast_result);
-
+        setForecasting(
+          finalResult?.forecasting || finalResult?.forecast_result
+        );
       } catch (err) {
         console.error(err);
         setError(err.message);
