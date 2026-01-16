@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin, ArrowRight } from "lucide-react";
+import { MapPin, ArrowRight, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const sites = [
@@ -12,6 +12,55 @@ const sites = [
 
 const Sites = () => {
     const navigate = useNavigate();
+    const [loadingSite, setLoadingSite] = useState(null);
+
+    const handleSiteClick = async (site) => {
+        if (site.id === "skippers-port") {
+            setLoadingSite(site.id);
+            try {
+                const response = await fetch(
+                    "https://staging.tezintel.com/api/accounts/login/",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            email: "jobate2673@mv6a.com",
+                            password: "12345678h.",
+                            rememberMe: false,
+                        }),
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("Login failed");
+                }
+
+                const data = await response.json();
+                localStorage.setItem("access_token", data.access);
+                localStorage.setItem("refresh_token", data.refresh);
+                localStorage.setItem(
+                    "user",
+                    JSON.stringify({
+                        user_id: data.user_id,
+                        email: data.email,
+                        fullName: data.fullName,
+                        user_type: data.user_type,
+                    })
+                );
+
+                navigate("/skippers");
+            } catch (error) {
+                console.error("Login error:", error);
+                alert("Login failed for site access.");
+            } finally {
+                setLoadingSite(null);
+            }
+        } else {
+            console.log(`Selected site: ${site.name}`);
+        }
+    };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-12 px-4">
@@ -38,23 +87,32 @@ const Sites = () => {
               transition={{ delay: index * 0.1 }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 cursor-pointer group hover:border-blue-300 transition-all"
-              onClick={() => {
-                  // Placeholder for navigation or action
-                  console.log(`Selected site: ${site.name}`);
-              }}
+              className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 cursor-pointer group hover:border-blue-300 transition-all relative overflow-hidden"
+              onClick={() => handleSiteClick(site)}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between relative z-10">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-blue-100 rounded-xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                    <MapPin size={24} />
+                    {loadingSite === site.id ? (
+                        <Loader2 className="animate-spin" size={24} />
+                    ) : (
+                        <MapPin size={24} />
+                    )}
                   </div>
                   <h3 className="text-xl font-bold text-gray-800 group-hover:text-blue-700 transition-colors">
                     {site.name}
                   </h3>
                 </div>
-                <ArrowRight className="text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" size={24} />
+                {loadingSite !== site.id && (
+                     <ArrowRight className="text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" size={24} />
+                )}
               </div>
+              {loadingSite === site.id && (
+                  <motion.div 
+                    layoutId="loading-overlay"
+                    className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-0" 
+                  />
+              )}
             </motion.div>
           ))}
         </div>

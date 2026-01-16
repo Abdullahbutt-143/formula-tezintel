@@ -5,7 +5,6 @@ const Skippers = () => {
   const [forecasting, setForecasting] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   useEffect(() => {
     const createAndFetchProject = async () => {
       try {
@@ -13,7 +12,6 @@ const Skippers = () => {
         if (!token) {
           throw new Error("No access token found");
         }
-
         const payload = {
           name: "skippers_port",
           project_type: "projectval",
