@@ -8,23 +8,31 @@ const Skippers = () => {
   const [error, setError] = useState(null);
   const [projectId, setProjectId] = useState(null);
   const [responseData, setResponseData] = useState(null);
-  const [excelData, setExcelData] = useState(null);
+  const [excelData, setExcelData] = useState(null); 
   useEffect(() => {
-    fetch("/data/sites.xlsx")
-      .then((res) => res.arrayBuffer())
-      .then((buffer) => {
+    const fetchExcelData = async () => {
+      try {
+        const response = await fetch("/data/sites.xlsx");
+        const buffer = await response.arrayBuffer();
         const workbook = XLSX.read(buffer, { type: "array" });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
         const skippersRecords = jsonData.filter(
-          (row) => row.Site && row.Site.toLowerCase().includes("skippers port")
+          (row) => row.Site && row.Site.toLowerCase().trim() === "skippers port"
         );
+        
         if (skippersRecords.length > 0) {
           setExcelData(skippersRecords[skippersRecords.length - 1]);
+        } else {
+             console.log("No Skippers Port record found in Excel");
         }
-      })
-      .catch((err) => console.error("Error loading Excel:", err));
+      } catch (err) {
+        console.error("Error loading Excel:", err);
+      }
+    };
+
+    fetchExcelData();
   }, []);
 
   useEffect(() => {
@@ -402,7 +410,11 @@ const Skippers = () => {
                   fontSize: "1.1em",
                 }}
               >
-                N/A
+                {excelData && excelData.Valuation
+                  ? `$${new Intl.NumberFormat("en-US").format(
+                      excelData.Forecast
+                    )}`
+                  : "N/A"}
               </td>
               <td
                 style={{
@@ -434,9 +446,9 @@ const Skippers = () => {
                   fontSize: "1.1em",
                 }}
               >
-                {excelData && excelData["Monthly Gasoline Volume"]
+                {excelData && excelData["Monthly Gas total"]
                   ? new Intl.NumberFormat("en-US").format(
-                      excelData["Monthly Gasoline Volume"]
+                      excelData["Monthly Gas total"]
                     )
                   : "N/A"}
               </td>
@@ -471,9 +483,9 @@ const Skippers = () => {
                   fontSize: "1.1em",
                 }}
               >
-                {excelData && excelData["Monthly Diesel Volume"]
+                {excelData && excelData["Monthly Diesel Gallons"]
                   ? new Intl.NumberFormat("en-US").format(
-                      excelData["Monthly Diesel Volume"]
+                      excelData["Monthly Diesel Gallons"]
                     )
                   : "N/A"}
               </td>
