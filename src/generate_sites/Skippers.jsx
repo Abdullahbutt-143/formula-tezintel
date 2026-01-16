@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import * as XLSX from "xlsx";
 
 const Skippers = () => {
   const [valuation, setValuation] = useState(null);
@@ -7,6 +8,30 @@ const Skippers = () => {
   const [error, setError] = useState(null);
   const [projectId, setProjectId] = useState(null);
   const [responseData, setResponseData] = useState(null);
+  const [excelData, setExcelData] = useState(null);
+
+  // Fetch Excel Data
+  useEffect(() => {
+    fetch("/data/sites.xlsx")
+      .then((res) => res.arrayBuffer())
+      .then((buffer) => {
+        const workbook = XLSX.read(buffer, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        
+        // Find latest "Skippers Port" record (assuming last one is latest if multiple)
+        const skippersRecords = jsonData.filter(row => 
+          row.Site && row.Site.toLowerCase().includes("skippers port")
+        );
+        
+        if (skippersRecords.length > 0) {
+          // Use the last record found
+          setExcelData(skippersRecords[skippersRecords.length - 1]);
+        }
+      })
+      .catch((err) => console.error("Error loading Excel:", err));
+  }, []);
 
   useEffect(() => {
     const createAndFetchProject = async () => {
@@ -76,6 +101,7 @@ const Skippers = () => {
             lng: -95.0511118,
           },
         ]));
+        
         const res1 = await fetch(
           "https://staging.tezintel.com/api/CommercialViewSet/",
           {
@@ -170,9 +196,21 @@ const Skippers = () => {
         console.log("Final Result:", finalResult);
         setResponseData(finalResult);
 
-        // Extract valuation and forecasting
-        setValuation(finalResult?.valuation || finalResult?.valuation_result || finalResult);
-        setForecasting(finalResult?.forecasting || finalResult?.forecast_result || finalResult);
+        // Extract valuation and forecasting from custom_data and new_monthly_volume_projections
+        const customValuation = finalResult.custom_data?.valuation___;
+        const customForecast = finalResult.custom_data?.forecast___;
+        const monthlyGas = finalResult.new_monthly_volume_projections?.table_data?.Year1?.["Monthly Gasoline Volume (Gallons)"];
+        const monthlyDiesel = finalResult.new_monthly_volume_projections?.table_data?.Year1?.["Diesel Volume (Gallons)"];
+
+        setValuation({
+            total: customValuation,
+            monthlyGas: monthlyGas,
+            monthlyDiesel: monthlyDiesel
+        });
+        setForecasting({
+            revenue: customForecast
+        });
+
       } catch (err) {
         console.error("Skippers project error:", err);
         setError(err.message);
@@ -235,23 +273,112 @@ const Skippers = () => {
 
   return (
     <div style={{ padding: "24px", fontFamily: "sans-serif" }}>
-      <h2>Project Valuation</h2>
-      {valuation ? (
-        <div className="card">
-          <pre>{JSON.stringify(valuation, null, 2)}</pre>
-        </div>
-      ) : (
-        <p>No valuation data available</p>
-      )}
+      <h2>Project Analysis Comparison</h2>
+      
+      <div style={{ overflowX: "auto", marginTop: "20px" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+          <thead>
+            <tr style={{ backgroundColor: "#f3f4f6", borderBottom: "2px solid #e5e7eb" }}>
+              <th style={{ padding: "12px", textAlign: "left", color: "#374151" }}>Metric</th>
+              <th style={{ padding: "12px", textAlign: "left", color: "#059669" }}>TezIntel API</th>
+              <th style={{ padding: "12px", textAlign: "left", color: "#2563eb" }}>Excel Record (Latest)</th>
+              <th style={{ padding: "12px", textAlign: "left", color: "#6b7280" }}>Difference</th>
+            </tr>
+          </thead>
+          <tbody>
+            {/* Valuation Row */}
+            <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
+              <td style={{ padding: "12px", fontWeight: "500" }}>Total Valuation</td>
+              <td style={{ padding: "12px", fontFamily: "monospace", fontSize: "1.1em" }}>
+                ${valuation?.total || "N/A"}
+              </td>
+              <td style={{ padding: "12px", fontFamily: "monospace", fontSize: "1.1em" }}>
+                {excelData && excelData.Valuation 
+                  ? `$${new Intl.NumberFormat('en-US').format(excelData.Valuation)}` 
+                  : "N/A"}
+              </td>
+              <td style={{ padding: "12px", color: "#6b7280", fontFamily: "monospace" }}>
+                {valuation?.total && excelData?.Valuation
+                   ? (parseFloat(valuation.total.replace(/,/g, '')) - parseFloat(excelData.Valuation)).toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+                   : "-"
+                }
+              </td>
+            </tr>
+            {/* Forecast Row */}
+            <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
+              <td style={{ padding: "12px", fontWeight: "500" }}>Forecasted Monthly Income</td>
+              <td style={{ padding: "12px", fontFamily: "monospace", fontSize: "1.1em" }}>
+                {valuation?.total?.substring(0,0)}
+                {forecasting?.revenue ? `$${forecasting.revenue}` : "N/A"}
+              </td>
+              <td style={{ padding: "12px", fontFamily: "monospace", fontSize: "1.1em" }}>
+                N/A
+              </td>
+               <td style={{ padding: "12px", color: "#6b7280", fontFamily: "monospace" }}>-</td>
+            </tr>
+            {/* Gasoline Volume Row */}
+            <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
+              <td style={{ padding: "12px", fontWeight: "500" }}>Monthly Gasoline Volume (Gallons)</td>
+              <td style={{ padding: "12px", fontFamily: "monospace", fontSize: "1.1em" }}>
+                {valuation?.monthlyGas || "N/A"}
+              </td>
+              <td style={{ padding: "12px", fontFamily: "monospace", fontSize: "1.1em" }}>
+                 {excelData && excelData["Monthly Gasoline Volume"] 
+                  ? new Intl.NumberFormat('en-US').format(excelData["Monthly Gasoline Volume"])
+                  : "N/A"}
+              </td>
+               <td style={{ padding: "12px", color: "#6b7280", fontFamily: "monospace" }}>-</td>
+            </tr>
+            {/* Diesel Volume Row */}
+            <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
+              <td style={{ padding: "12px", fontWeight: "500" }}>Monthly Diesel Volume (Gallons)</td>
+              <td style={{ padding: "12px", fontFamily: "monospace", fontSize: "1.1em" }}>
+                {valuation?.monthlyDiesel || "N/A"}
+              </td>
+              <td style={{ padding: "12px", fontFamily: "monospace", fontSize: "1.1em" }}>
+                 {excelData && excelData["Monthly Diesel Volume"] 
+                  ? new Intl.NumberFormat('en-US').format(excelData["Monthly Diesel Volume"])
+                  : "N/A"}
+              </td>
+               <td style={{ padding: "12px", color: "#6b7280", fontFamily: "monospace" }}>-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <h2 style={{ marginTop: "32px" }}>Forecasting</h2>
-      {forecasting ? (
-        <div className="card">
-          <pre>{JSON.stringify(forecasting, null, 2)}</pre>
-        </div>
-      ) : (
-        <p>No forecasting data available</p>
-      )}
+      <div style={{ marginTop: '32px' }}>
+        <details>
+          <summary style={{ padding: '12px', cursor: 'pointer', backgroundColor: '#f9fafb', borderRadius: '6px' }}>
+            View Full API Response
+          </summary>
+          <pre style={{ 
+            marginTop: '10px', 
+            padding: '16px', 
+            backgroundColor: '#1f2937', 
+            color: '#f3f4f6', 
+            borderRadius: '8px', 
+            overflowX: 'auto',
+            maxHeight: '400px'
+          }}>
+            {JSON.stringify(responseData, null, 2)}
+          </pre>
+        </details>
+      </div>
+      <style>{`
+        .spinner {
+          display: inline-block;
+          width: 40px;
+          height: 40px;
+          border: 4px solid rgba(0, 0, 0, 0.1);
+          border-radius: 50%;
+          border-top-color: #1a237e;
+          animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };
