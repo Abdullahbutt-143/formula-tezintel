@@ -423,7 +423,15 @@ const Skippers = () => {
                   fontFamily: "monospace",
                 }}
               >
-                -
+                {forecasting?.revenue && excelData?.Forecast
+                  ? (
+                      parseFloat(forecasting.revenue.replace(/,/g, "")) -
+                      parseFloat(excelData.Forecast)
+                    ).toLocaleString("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    })
+                  : "-"}
               </td>
             </tr>
             <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
@@ -459,7 +467,12 @@ const Skippers = () => {
                   fontFamily: "monospace",
                 }}
               >
-                -
+                {valuation?.monthlyGas && excelData?.["Monthly Gas total"]
+                  ? new Intl.NumberFormat("en-US").format(
+                      parseFloat(valuation.monthlyGas.replace(/,/g, "")) -
+                        parseFloat(excelData["Monthly Gas total"])
+                    )
+                  : "-"}
               </td>
             </tr>
             {/* Diesel Volume Row */}
@@ -496,7 +509,12 @@ const Skippers = () => {
                   fontFamily: "monospace",
                 }}
               >
-                -
+                {valuation?.monthlyDiesel && excelData?.["Monthly Diesel Gallons"]
+                  ? new Intl.NumberFormat("en-US").format(
+                      parseFloat(valuation.monthlyDiesel.replace(/,/g, "")) -
+                        parseFloat(excelData["Monthly Diesel Gallons"])
+                    )
+                  : "-"}
               </td>
             </tr>
           </tbody>
