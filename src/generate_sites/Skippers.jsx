@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
+import { motion } from "framer-motion";
+import {
+  ArrowLeft,
+  Database,
+  BarChart3,
+  DollarSign,
+  Droplets,
+  Fuel,
+} from "lucide-react";
 
 const Skippers = () => {
   const [valuation, setValuation] = useState(null);
@@ -8,7 +18,10 @@ const Skippers = () => {
   const [error, setError] = useState(null);
   const [projectId, setProjectId] = useState(null);
   const [responseData, setResponseData] = useState(null);
-  const [excelData, setExcelData] = useState(null); 
+  const [excelData, setExcelData] = useState(null);
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchExcelData = async () => {
       try {
@@ -21,11 +34,11 @@ const Skippers = () => {
         const skippersRecords = jsonData.filter(
           (row) => row.Site && row.Site.toLowerCase().trim() === "skippers port"
         );
-        
+
         if (skippersRecords.length > 0) {
           setExcelData(skippersRecords[skippersRecords.length - 1]);
         } else {
-             console.log("No Skippers Port record found in Excel");
+          console.log("No Skippers Port record found in Excel");
         }
       } catch (err) {
         console.error("Error loading Excel:", err);
@@ -218,13 +231,11 @@ const Skippers = () => {
         const customValuation = finalResult.custom_data?.valuation___;
         const customForecast = finalResult.custom_data?.forecast___;
         const monthlyGas =
-          finalResult?.custom_data?.new_monthly_volume_projections?.table_data?.Year1?.[
-          "Monthly Gasoline Volume (Gallons)"
-          ];
+          finalResult?.custom_data?.new_monthly_volume_projections?.table_data
+            ?.Year1?.["Monthly Gasoline Volume (Gallons)"];
         const monthlyDiesel =
-          finalResult?.custom_data?.new_monthly_volume_projections?.table_data?.Year1?.[
-            "Diesel Volume (Gallons)"
-          ];
+          finalResult?.custom_data?.new_monthly_volume_projections?.table_data
+            ?.Year1?.["Diesel Volume (Gallons)"];
         console.log("monthlyGas", monthlyGas);
         setValuation({
           total: customValuation,
@@ -247,23 +258,14 @@ const Skippers = () => {
 
   if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "400px",
-          fontSize: "18px",
-          color: "#666",
-        }}
-      >
-        <div>
-          <div style={{ textAlign: "center", marginBottom: "16px" }}>
-            <div className="spinner"></div>
-          </div>
-          <p>Loading valuation data...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center bg-white/50 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-white/40">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-lg font-medium text-gray-700">
+            Analyzing Site Data...
+          </p>
           {projectId && (
-            <p style={{ fontSize: "14px", color: "#888" }}>
+            <p className="text-sm text-gray-500 mt-2">
               Project ID: {projectId}
             </p>
           )}
@@ -274,295 +276,269 @@ const Skippers = () => {
 
   if (error) {
     return (
-      <div
-        style={{
-          padding: "24px",
-          backgroundColor: "#fee",
-          border: "1px solid #fcc",
-          borderRadius: "8px",
-          margin: "20px",
-        }}
-      >
-        <h3 style={{ color: "#c00", marginBottom: "16px" }}>Error</h3>
-        <p style={{ color: "#900", marginBottom: "12px" }}>{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          Retry
-        </button>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-red-100 max-w-md w-full">
+          <h3 className="text-xl font-bold text-red-600 mb-2">
+            Analysis Failed
+          </h3>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/25"
+          >
+            Retry Analysis
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: "24px", fontFamily: "sans-serif" }}>
-      <h2>Project Analysis Comparison</h2>
-
-      <div style={{ overflowX: "auto", marginTop: "20px" }}>
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            backgroundColor: "white",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-          }}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
         >
-          <thead>
-            <tr
-              style={{
-                backgroundColor: "#f3f4f6",
-                borderBottom: "2px solid #e5e7eb",
-              }}
-            >
-              <th
-                style={{ padding: "12px", textAlign: "left", color: "#374151" }}
-              >
-                Metric
-              </th>
-              <th
-                style={{ padding: "12px", textAlign: "left", color: "#059669" }}
-              >
-                TezIntel API
-              </th>
-              <th
-                style={{ padding: "12px", textAlign: "left", color: "#2563eb" }}
-              >
-                Excel Record (Latest)
-              </th>
-              <th
-                style={{ padding: "12px", textAlign: "left", color: "#6b7280" }}
-              >
-                Difference
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
-              <td style={{ padding: "12px", fontWeight: "500" }}>
-                Total Valuation
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  fontFamily: "monospace",
-                  fontSize: "1.1em",
-                }}
-              >
-                ${valuation?.total || "N/A"}
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  fontFamily: "monospace",
-                  fontSize: "1.1em",
-                }}
-              >
-                {excelData && excelData.Valuation
-                  ? `$${new Intl.NumberFormat("en-US").format(
-                      excelData.Valuation
-                    )}`
-                  : "N/A"}
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  color: "#6b7280",
-                  fontFamily: "monospace",
-                }}
-              >
-                {valuation?.total && excelData?.Valuation
-                  ? (
-                      parseFloat(valuation.total.replace(/,/g, "")) -
-                      parseFloat(excelData.Valuation)
-                    ).toLocaleString("en-US", {
-                      style: "currency",
-                      currency: "USD",
-                    })
-                  : "-"}
-              </td>
-            </tr>
-            <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
-              <td style={{ padding: "12px", fontWeight: "500" }}>
-                Forecasted Monthly Income
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  fontFamily: "monospace",
-                  fontSize: "1.1em",
-                }}
-              >
-                {valuation?.total?.substring(0, 0)}
-                {forecasting?.revenue ? `$${forecasting.revenue}` : "N/A"}
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  fontFamily: "monospace",
-                  fontSize: "1.1em",
-                }}
-              >
-                {excelData && excelData.Valuation
-                  ? `$${new Intl.NumberFormat("en-US").format(
-                      excelData.Forecast
-                    )}`
-                  : "N/A"}
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  color: "#6b7280",
-                  fontFamily: "monospace",
-                }}
-              >
-                {forecasting?.revenue && excelData?.Forecast
-                  ? (
-                      parseFloat(forecasting.revenue.replace(/,/g, "")) -
-                      parseFloat(excelData.Forecast)
-                    ).toLocaleString("en-US", {
-                      style: "currency",
-                      currency: "USD",
-                    })
-                  : "-"}
-              </td>
-            </tr>
-            <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
-              <td style={{ padding: "12px", fontWeight: "500" }}>
-                Monthly Gasoline Volume (Gallons)
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  fontFamily: "monospace",
-                  fontSize: "1.1em",
-                }}
-              >
-                {valuation?.monthlyGas || "N/A"}
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  fontFamily: "monospace",
-                  fontSize: "1.1em",
-                }}
-              >
-                {excelData && excelData["Monthly Gas total"]
-                  ? new Intl.NumberFormat("en-US").format(
-                      excelData["Monthly Gas total"]
-                    )
-                  : "N/A"}
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  color: "#6b7280",
-                  fontFamily: "monospace",
-                }}
-              >
-                {valuation?.monthlyGas && excelData?.["Monthly Gas total"]
-                  ? new Intl.NumberFormat("en-US").format(
-                      parseFloat(valuation.monthlyGas.replace(/,/g, "")) -
-                        parseFloat(excelData["Monthly Gas total"])
-                    )
-                  : "-"}
-              </td>
-            </tr>
-            {/* Diesel Volume Row */}
-            <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
-              <td style={{ padding: "12px", fontWeight: "500" }}>
-                Monthly Diesel Volume (Gallons)
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  fontFamily: "monospace",
-                  fontSize: "1.1em",
-                }}
-              >
-                {valuation?.monthlyDiesel || "N/A"}
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  fontFamily: "monospace",
-                  fontSize: "1.1em",
-                }}
-              >
-                {excelData && excelData["Monthly Diesel Gallons"]
-                  ? new Intl.NumberFormat("en-US").format(
-                      excelData["Monthly Diesel Gallons"]
-                    )
-                  : "N/A"}
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  color: "#6b7280",
-                  fontFamily: "monospace",
-                }}
-              >
-                {valuation?.monthlyDiesel && excelData?.["Monthly Diesel Gallons"]
-                  ? new Intl.NumberFormat("en-US").format(
-                      parseFloat(valuation.monthlyDiesel.replace(/,/g, "")) -
-                        parseFloat(excelData["Monthly Diesel Gallons"])
-                    )
-                  : "-"}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+          <button
+            onClick={() => navigate(-1)}
+            className="group flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6 transition-colors font-medium"
+          >
+            <div className="p-2 bg-white rounded-lg shadow-sm group-hover:shadow-md transition-all">
+              <ArrowLeft size={20} />
+            </div>
+            Back to Dashboard
+          </button>
 
-      <div style={{ marginTop: "32px" }}>
-        <details>
-          <summary
-            style={{
-              padding: "12px",
-              cursor: "pointer",
-              backgroundColor: "#f9fafb",
-              borderRadius: "6px",
-            }}
-          >
-            View Full API Response
-          </summary>
-          <pre
-            style={{
-              marginTop: "10px",
-              padding: "16px",
-              backgroundColor: "#1f2937",
-              color: "#f3f4f6",
-              borderRadius: "8px",
-              overflowX: "auto",
-              maxHeight: "400px",
-            }}
-          >
-            {JSON.stringify(responseData, null, 2)}
-          </pre>
-        </details>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-white/20">
+            <div className="flex items-center gap-4">
+              <div className="p-4 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl text-white shadow-lg shadow-blue-500/30">
+                <Database size={32} />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-1">
+                  Skippers Port Analysis
+                </h1>
+                <p className="text-gray-600">
+                  Comprehensive Valuation & Forecasting Report
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden"
+        >
+          <div className="p-6 border-b border-gray-100/50 flex justify-between items-center bg-gray-50/50">
+            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+              <BarChart3 className="text-blue-600" size={24} />
+              Data Comparison
+            </h2>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50/80 border-b border-gray-200/60">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                    Metric
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-green-700 uppercase tracking-wider">
+                    TezIntel API
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-blue-700 uppercase tracking-wider">
+                    Excel Record (Latest)
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                    Difference
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100/50">
+                {/* Valuation Row */}
+                <tr className="hover:bg-blue-50/30 transition-colors">
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-green-100 rounded-lg text-green-600">
+                        <DollarSign size={18} />
+                      </div>
+                      <span className="font-medium text-gray-700">
+                        Total Valuation
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5 font-mono text-lg font-semibold text-gray-900">
+                    ${valuation?.total || "N/A"}
+                  </td>
+                  <td className="px-6 py-5 font-mono text-lg font-medium text-gray-600">
+                    {excelData && excelData.Valuation
+                      ? `$${new Intl.NumberFormat("en-US").format(
+                          excelData.Valuation
+                        )}`
+                      : "N/A"}
+                  </td>
+                  <td className="px-6 py-5 font-mono text-gray-500">
+                    {valuation?.total && excelData?.Valuation ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                        {(
+                          parseFloat(valuation.total.replace(/,/g, "")) -
+                          parseFloat(excelData.Valuation)
+                        ).toLocaleString("en-US", {
+                          style: "currency",
+                          currency: "USD",
+                        })}
+                      </span>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+                </tr>
+
+                {/* Forecast Row */}
+                <tr className="hover:bg-blue-50/30 transition-colors">
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-purple-100 rounded-lg text-purple-600">
+                        <BarChart3 size={18} />
+                      </div>
+                      <span className="font-medium text-gray-700">
+                        Forecasted Monthly Income
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5 font-mono text-lg font-semibold text-gray-900">
+                    {forecasting?.revenue ? `$${forecasting.revenue}` : "N/A"}
+                  </td>
+                  <td className="px-6 py-5 font-mono text-lg font-medium text-gray-600">
+                    {excelData && excelData.Forecast
+                      ? `$${new Intl.NumberFormat("en-US").format(
+                          excelData.Forecast
+                        )}`
+                      : "N/A"}
+                  </td>
+                  <td className="px-6 py-5 font-mono text-gray-500">
+                    {forecasting?.revenue && excelData?.Forecast ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                        {(
+                          parseFloat(forecasting.revenue.replace(/,/g, "")) -
+                          parseFloat(excelData.Forecast)
+                        ).toLocaleString("en-US", {
+                          style: "currency",
+                          currency: "USD",
+                        })}
+                      </span>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+                </tr>
+
+                {/* Gasoline Volume Row */}
+                <tr className="hover:bg-blue-50/30 transition-colors">
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-orange-100 rounded-lg text-orange-600">
+                        <Fuel size={18} />
+                      </div>
+                      <span className="font-medium text-gray-700">
+                        Monthly Gasoline Volume
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5 font-mono text-lg font-semibold text-gray-900">
+                    {valuation?.monthlyGas || "N/A"}
+                  </td>
+                  <td className="px-6 py-5 font-mono text-lg font-medium text-gray-600">
+                    {excelData && excelData["Monthly Gas total"]
+                      ? new Intl.NumberFormat("en-US").format(
+                          excelData["Monthly Gas total"]
+                        )
+                      : "N/A"}
+                  </td>
+                  <td className="px-6 py-5 font-mono text-gray-500">
+                    {valuation?.monthlyGas && excelData?.["Monthly Gas total"] ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                        {new Intl.NumberFormat("en-US").format(
+                          parseFloat(valuation.monthlyGas.replace(/,/g, "")) -
+                            parseFloat(excelData["Monthly Gas total"])
+                        )}
+                      </span>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+                </tr>
+
+                {/* Diesel Volume Row */}
+                <tr className="hover:bg-blue-50/30 transition-colors">
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-slate-100 rounded-lg text-slate-600">
+                        <Droplets size={18} />
+                      </div>
+                      <span className="font-medium text-gray-700">
+                        Monthly Diesel Volume
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5 font-mono text-lg font-semibold text-gray-900">
+                    {valuation?.monthlyDiesel || "N/A"}
+                  </td>
+                  <td className="px-6 py-5 font-mono text-lg font-medium text-gray-600">
+                    {excelData && excelData["Monthly Diesel Gallons"]
+                      ? new Intl.NumberFormat("en-US").format(
+                          excelData["Monthly Diesel Gallons"]
+                        )
+                      : "N/A"}
+                  </td>
+                  <td className="px-6 py-5 font-mono text-gray-500">
+                    {valuation?.monthlyDiesel &&
+                    excelData?.["Monthly Diesel Gallons"] ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                        {new Intl.NumberFormat("en-US").format(
+                          parseFloat(
+                            valuation.monthlyDiesel.replace(/,/g, "")
+                          ) - parseFloat(excelData["Monthly Diesel Gallons"])
+                        )}
+                      </span>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-8"
+        >
+          <details className="group bg-white/50 backdrop-blur-sm rounded-xl border border-white/40 overflow-hidden transition-all duration-300 hover:bg-white/80 open:bg-white/80 open:shadow-lg">
+            <summary className="flex items-center justify-between p-4 cursor-pointer select-none">
+              <span className="font-medium text-gray-600 group-open:text-blue-600 transition-colors">
+                View Raw API Response
+              </span>
+              <div className="p-1 rounded-full bg-gray-100 group-open:bg-blue-100 group-open:text-blue-600 transition-all text-gray-400">
+                <Database size={16} />
+              </div>
+            </summary>
+            <div className="p-4 pt-0 border-t border-gray-100/50">
+              <pre className="bg-slate-900 text-slate-50 p-4 rounded-lg overflow-x-auto text-xs font-mono max-h-96 shadow-inner">
+                {JSON.stringify(responseData, null, 2)}
+              </pre>
+            </div>
+          </details>
+        </motion.div>
       </div>
-      <style>{`
-        .spinner {
-          display: inline-block;
-          width: 40px;
-          height: 40px;
-          border: 4px solid rgba(0, 0, 0, 0.1);
-          border-radius: 50%;
-          border-top-color: #1a237e;
-          animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 };
