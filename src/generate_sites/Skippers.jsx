@@ -9,8 +9,6 @@ const Skippers = () => {
   const [projectId, setProjectId] = useState(null);
   const [responseData, setResponseData] = useState(null);
   const [excelData, setExcelData] = useState(null);
-
-  // Fetch Excel Data
   useEffect(() => {
     fetch("/data/sites.xlsx")
       .then((res) => res.arrayBuffer())
@@ -19,14 +17,10 @@ const Skippers = () => {
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
-        
-        // Find latest "Skippers Port" record (assuming last one is latest if multiple)
         const skippersRecords = jsonData.filter(row => 
           row.Site && row.Site.toLowerCase().includes("skippers port")
         );
-        
         if (skippersRecords.length > 0) {
-          // Use the last record found
           setExcelData(skippersRecords[skippersRecords.length - 1]);
         }
       })
@@ -195,8 +189,6 @@ const Skippers = () => {
         const finalResult = await res2.json();
         console.log("Final Result:", finalResult);
         setResponseData(finalResult);
-
-        // Extract valuation and forecasting from custom_data and new_monthly_volume_projections
         const customValuation = finalResult.custom_data?.valuation___;
         const customForecast = finalResult.custom_data?.forecast___;
         const monthlyGas = finalResult.new_monthly_volume_projections?.table_data?.Year1?.["Monthly Gasoline Volume (Gallons)"];
@@ -286,7 +278,6 @@ const Skippers = () => {
             </tr>
           </thead>
           <tbody>
-            {/* Valuation Row */}
             <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
               <td style={{ padding: "12px", fontWeight: "500" }}>Total Valuation</td>
               <td style={{ padding: "12px", fontFamily: "monospace", fontSize: "1.1em" }}>
@@ -304,7 +295,6 @@ const Skippers = () => {
                 }
               </td>
             </tr>
-            {/* Forecast Row */}
             <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
               <td style={{ padding: "12px", fontWeight: "500" }}>Forecasted Monthly Income</td>
               <td style={{ padding: "12px", fontFamily: "monospace", fontSize: "1.1em" }}>
