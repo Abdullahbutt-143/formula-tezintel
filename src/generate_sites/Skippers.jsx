@@ -116,7 +116,6 @@ const Skippers = () => {
           }
         );
         const data1 = await res1.json();
-        console.log("Step 1 Response:", data1);
         if (!data1.pid) {
           throw new Error(
             `PID not returned from Step 1: ${JSON.stringify(data1)}`
@@ -207,39 +206,18 @@ const Skippers = () => {
         );
 
         const finalResult = await res2.json();
-        console.log("Final Result:", finalResult);
         setResponseData(finalResult);
         const customValuation = finalResult.custom_data?.valuation___;
         const customForecast = finalResult.custom_data?.forecast___;
-        console.log("Full finalResult:", finalResult);
-        console.log(
-          "new_monthly_volume_projections: 1 ",
-          finalResult?.custom_data?.new_monthly_volume_projections
-        );
-        console.log(
-          "new_monthly_volume_projections:",
-          finalResult?.new_monthly_volume_projections
-        );
-
-        console.log(
-          "table_data:",
-          finalResult?.new_monthly_volume_projections?.table_data
-        );
-
-        console.log(
-          "Year1:",
-          finalResult?.new_monthly_volume_projections?.table_data?.Year1
-        );
         const monthlyGas =
           finalResult?.custom_data?.new_monthly_volume_projections?.table_data?.Year1?.[
-        "Monthly Gasoline Volume (Gallons)"
+          "Monthly Gasoline Volume (Gallons)"
           ];
         const monthlyDiesel =
           finalResult?.custom_data?.new_monthly_volume_projections?.table_data?.Year1?.[
             "Diesel Volume (Gallons)"
           ];
 
-        console.log("Monthly Gasoline Volume (Gallons):", monthlyGas);
         setValuation({
           total: customValuation,
           monthlyGas: monthlyGas,
@@ -436,8 +414,6 @@ const Skippers = () => {
                 -
               </td>
             </tr>
-            {console.log("Valuation object:", valuation)}
-            {/* Gasoline Volume Row */}
             <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
               <td style={{ padding: "12px", fontWeight: "500" }}>
                 Monthly Gasoline Volume (Gallons)
